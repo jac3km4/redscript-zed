@@ -1,0 +1,15 @@
+id = "redscript"
+name = "REDscript"
+version = "0.0.1"
+schema_version = 1
+authors = ["jekky <gh@jekky.dev>"]
+description = "REDscript support"
+repository = "https://github.com/jac3km4/redscript-zed"
+
+[language_servers.redscript-ide]
+name = "redscript-ide"
+language = "REDscript"
+
+[grammars.redscript]
+repository = "https://github.com/jac3km4/tree-sitter-redscript"
+commit = "08dd7c698c64b0d55265c4462ec3e32728a0d82e"
