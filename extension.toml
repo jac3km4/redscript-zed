@@ -3,7 +3,9 @@ name = "REDscript"
 version = "0.1.0"
 schema_version = 1
 authors = ["jekky <gh@jekky.dev>"]
-description = "REDscript support"
+description = """
+REDscript is an open-source programming language and toolset designed to work natively with Cyberpunk 2077's scripting runtime.
+"""
 repository = "https://github.com/jac3km4/redscript-zed"
 
 [language_servers.redscript-ide]
