@@ -1,217 +1,155 @@
-[ "." ";" ":" "," ] @punctuation.delimiter
-[ "\\(" "(" ")" "[" "]" "{" "}" ] @punctuation.bracket ; TODO: "\\(" ")" in interpolations should be @punctuation.special
+; Base identifier rule
+(identifier) @variable
 
-; Identifiers
-(attribute) @variable
-(type_identifier) @type
-(self_expression) @variable.builtin
-(user_type (type_identifier) @variable.builtin (#eq? @variable.builtin "Self"))
-
-; Declarations
-"func" @keyword.function
+; Keywords
 [
-  (visibility_modifier)
-  (member_modifier)
-  (function_modifier)
-  (property_modifier)
-  (parameter_modifier)
-  (inheritance_modifier)
-  (mutation_modifier)
-] @keyword
-
-(function_declaration (simple_identifier) @function.method)
-(init_declaration ["init" @constructor])
-(deinit_declaration ["deinit" @constructor])
-(throws) @keyword
-"async" @keyword
-"await" @keyword
-(where_keyword) @keyword
-(parameter external_name: (simple_identifier) @property)
-(parameter name: (simple_identifier) @property)
-(type_parameter (type_identifier) @property)
-(inheritance_constraint (identifier (simple_identifier) @property))
-(equality_constraint (identifier (simple_identifier) @property))
-(pattern bound_identifier: (simple_identifier)) @variable
-
-[
-  "typealias"
-  "struct"
+  "func"
   "class"
-  "actor"
+  "struct"
   "enum"
-  "protocol"
-  "extension"
-  "indirect"
-  "nonisolated"
-  "override"
-  "convenience"
-  "required"
-  "mutating"
-  "nonmutating"
-  "associatedtype"
+  "let"
+  "import"
+  "module"
+  "extends"
+  "as"
 ] @keyword
-
-(opaque_type ["some" @keyword])
-(existential_type ["any" @keyword])
-
-(precedence_group_declaration
- ["precedencegroup" @keyword]
- (simple_identifier) @type)
-(precedence_group_attribute
- (simple_identifier) @keyword
- [(simple_identifier) @type
-  (boolean_literal) @boolean])
 
 [
-  (getter_specifier)
-  (setter_specifier)
-  (modify_specifier)
+  "if"
+  "else"
+  "switch"
+  "case"
+  "default"
+  "while"
+  "for"
+  "in"
+  "break"
+  "continue"
+  "return"
 ] @keyword
 
-(class_body (property_declaration (pattern (simple_identifier) @variable.parameter)))
-(protocol_property_declaration (pattern (simple_identifier) @variable.parameter))
+; Modifiers and visibility
+(visibility) @keyword
+(item_qualifier) @keyword
 
-(value_argument
-  name: (value_argument_label) @property)
+; Constants and built-ins
+[
+  "true"
+  "false"
+] @boolean
 
-(import_declaration
-  "import" @keyword.import)
+"null" @constant
 
+[
+  "this"
+  "super"
+] @variable.special
+
+; Annotations
+(annotation
+  "@" @punctuation.special
+  name: (identifier) @function.macro)
+
+(annotation
+  "(" @punctuation.bracket
+  (_) @type
+  ")" @punctuation.bracket)
+
+; Types and declarations
+(class_declaration
+  name: (identifier) @type)
+(enum_declaration
+  name: (identifier) @type)
+(type
+  (named_type
+    name: (identifier) @type))
+
+; Enum entries
 (enum_entry
-  "case" @keyword)
+  name: (identifier) @enum)
+
+; Functions and methods
+(function_declaration
+    name: (identifier) @function)
+
+(item_qualifier
+  "native" @keyword)
+
+; Member access
+(member_expression
+  member: (identifier) @property)
+
+; Method calls
+(call_expression
+  function: (expression
+    (member_expression
+      member: (identifier) @function.method)))
 
 ; Function calls
-(call_expression (simple_identifier) @function.call) ; foo()
-(call_expression ; foo.bar.baz(): highlight the baz()
-  (navigation_expression
-    (navigation_suffix (simple_identifier) @function.call)))
-((navigation_expression
-   (simple_identifier) @type) ; SomeType.method(): highlight SomeType as a type
-   (#match? @property "^[A-Z]"))
-(call_expression (simple_identifier) @keyword (#eq? @keyword "defer")) ; defer { ... }
+(call_expression
+  function: (expression
+    (primary_expression
+      (identifier) @function)))
 
-(try_operator) @operator
-(try_operator ["try" @keyword])
+; Parameters
+(parameter
+  name: (identifier) @variable)
 
-(directive) @function.macro
-(diagnostic) @function.macro
-
-; Statements
-(for_statement ["for" @keyword.repeat])
-(for_statement ["in" @keyword.repeat])
-(for_statement (pattern) @variable)
-(else) @keyword
-(as_operator) @keyword
-
-["while" "repeat" "continue" "break"] @keyword.repeat
-
-["let" "var"] @keyword
-
-(guard_statement
-  "guard" @keyword.conditional)
-
-(if_statement
-  "if" @keyword.conditional)
-
-(switch_statement
-  "switch" @keyword.conditional)
-
-(switch_entry
-  "case" @keyword)
-
-(switch_entry
-  "fallthrough" @keyword)
-
-(switch_entry
-  (default_keyword) @keyword)
-
-"return" @keyword.return
-
-(ternary_expression
-  ["?" ":"] @keyword.conditional)
-
-["do" (throw_keyword) (catch_keyword)] @keyword
-
-(statement_label) @label
-
-; Comments
-[
-  (comment)
-  (multiline_comment)
-] @comment @spell
-
-((comment) @comment.documentation
-  (#lua-match? @comment.documentation "^///[^/]"))
-
-((comment) @comment.documentation
-  (#lua-match? @comment.documentation "^///$"))
-
-((multiline_comment) @comment.documentation
-  (#lua-match? @comment.documentation "^/[*][*][^*].*[*]/$"))
-
-; String literals
-(line_str_text) @string
-(str_escaped_char) @string
-(multi_line_str_text) @string
-(raw_str_part) @string
-(raw_str_end_part) @string
-(raw_str_interpolation_start) @punctuation.special
-["\"" "\"\"\""] @string
-
-; Lambda literals
-(lambda_literal ["in" @keyword.operator])
-
-; Basic literals
-[
-  (integer_literal)
-  (hex_literal)
-  (oct_literal)
-  (bin_literal)
-] @number
-(real_literal) @number.float
-(boolean_literal) @boolean
-"nil" @keyword
-
-; Regex literals
-(regex_literal) @string.regexp
+; Module and imports
+(module_declaration
+  (module_path
+    (identifier) @namespace))
+(import_declaration "import" @keyword)
 
 ; Operators
-(custom_operator) @operator
-
 [
-  "!"
-  "?"
   "+"
   "-"
   "*"
   "/"
   "%"
-  "="
+  "=="
+  "!="
+  "<"
+  "<="
+  ">"
+  ">="
+  "&&"
+  "||"
+  "&"
+  "|"
+  "^"
+  "!"
+  "~"
   "+="
   "-="
   "*="
   "/="
-  "<"
-  ">"
-  "<="
-  ">="
-  "++"
-  "--"
-  "&"
-  "~"
-  "%="
-  "!="
-  "!=="
-  "=="
-  "==="
-  "??"
-  "->"
-  "..<"
-  "..."
-  (bang)
+  "|="
+  "&="
+  "?"
 ] @operator
 
-(value_parameter_pack ["each" @keyword])
-(value_pack_expansion ["repeat" @keyword])
-(type_parameter_pack ["each" @keyword])
-(type_pack_expansion ["repeat" @keyword])
+; Punctuation
+[ "." ";" ":" "," "->" ] @punctuation.delimiter
+[ "(" ")" "[" "]" "{" "}" ] @punctuation.bracket
+
+; Comments
+(line_comment) @comment
+(block_comment) @comment
+(doc_comment) @comment.doc
+
+; Strings and literals
+(string) @string
+(string_content) @string
+(interpolated_string) @string
+(escape_sequence) @string.escape
+(cname) @string.special
+(resref) @string.special
+(tdbid) @string.special
+
+; Numbers
+(number) @number
+
+; Array literals
+(array_literal) @punctuation.bracket

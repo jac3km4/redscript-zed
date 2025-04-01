@@ -1,18 +1,23 @@
-
-
-; MARK: Structure
-
 (function_declaration
-  body: (_) @function.inside) @function.around
+  body: (block) @function.inside) @function.around
 
-; TODO: Classes/structs/enums
+(class_declaration
+  body: (_) @class.inside) @class.around
 
+(struct_declaration
+  body: (_) @struct.inside) @struct.around
 
-; MARK: Tests
+(if_statement
+  condition: (_) @conditional.inside) @conditional.around
 
-; Only matches prefix test. Other conventions
-; might be nice to add!
-(function_declaration
-	name: (simple_identifier) @_name
-	(#match? @_name "^test")
-)
+(while_statement
+  condition: (_) @loop.inside) @loop.around
+
+(for_statement
+  (block) @loop.inside) @loop.around
+
+(parameter
+  ":" @parameter.inside) @parameter.around
+
+(lambda_expression
+  expression_body: (_) @function.inside) @function.around

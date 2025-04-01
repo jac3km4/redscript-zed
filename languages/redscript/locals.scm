@@ -1,18 +1,33 @@
-(import_declaration (identifier) @definition.import)
-(function_declaration name: (simple_identifier) @definition.function)
+(function_declaration
+  name: (identifier) @definition.function) @scope
 
-; Scopes
+(class_declaration
+  name: (identifier) @definition.class) @scope
+
+(struct_declaration
+  name: (identifier) @definition.struct) @scope
+
+(enum_declaration
+  name: (identifier) @definition.enum) @scope
+
+(let_statement
+  name: (identifier) @definition.var) @scope
+
+(parameter
+  name: (identifier) @definition.parameter)
+
 [
- (statements)
- (for_statement)
- (while_statement)
- (repeat_while_statement)
- (do_statement)
- (if_statement)
- (guard_statement)
- (switch_statement)
- (property_declaration)
- (function_declaration)
- (class_declaration)
- (protocol_declaration)
-] @local.scope
+  (block)
+  (if_statement)
+  (while_statement)
+  (for_statement)
+  (switch_statement)
+] @scope
+
+(import_declaration
+  (module_path) @definition.import)
+
+(lambda_parameter
+  name: (identifier) @definition.parameter)
+
+(lambda_expression) @scope

@@ -1,51 +1,64 @@
+; Class-like definitions
 (class_declaration
-  name: (type_identifier) @name) @definition.class
+  name: (identifier) @name) @definition.class
 
-(protocol_declaration
-  name: (type_identifier) @name) @definition.interface
+(struct_declaration
+  name: (identifier) @name) @definition.struct
 
-(class_declaration
-    (class_body
-        [
-            (function_declaration
-                name: (simple_identifier) @name
-            )
-            (subscript_declaration
-                (parameter (simple_identifier) @name)
-            )
-            (init_declaration "init" @name)
-            (deinit_declaration "deinit" @name)
-        ]
-    )
-) @definition.method
+(enum_declaration
+  name: (identifier) @name) @definition.enum
 
-(protocol_declaration
-    (protocol_body
-        [
-            (protocol_function_declaration
-                name: (simple_identifier) @name
-            )
-            (subscript_declaration
-                (parameter (simple_identifier) @name)
-            )
-            (init_declaration "init" @name)
-        ]
-    )
-) @definition.method
-
-(class_declaration
-    (class_body
-        [
-            (property_declaration
-                (pattern (simple_identifier) @name)
-            )
-        ]
-    )
-) @definition.property
-
-(property_declaration
-    (pattern (simple_identifier) @name)
-) @definition.property
-
+; Function definitions
 (function_declaration
-    name: (simple_identifier) @name) @definition.function
+  name: (identifier) @name) @definition.method
+
+; Field/Property definitions
+(field_declaration
+  name: (identifier) @name) @definition.field
+
+; Enum entries
+(enum_entry
+  name: (identifier) @name) @definition.enum
+
+; Parameters in functions
+(parameter
+  name: (identifier) @name) @definition.parameter
+
+; Let declarations
+(let_statement
+  name: (identifier) @name) @definition.variable
+
+; Module definitions
+(module_path
+  (identifier) @name) @definition.namespace
+
+; References
+(call_expression
+  function: (identifier) @name) @reference.call
+
+(member_expression
+  member: (identifier) @name) @reference.property
+
+(named_type
+  name: (identifier) @name) @reference.type
+
+; Import references
+(import_declaration
+  (module_path) @name) @reference.import
+
+; Lambda functions
+(lambda_expression
+  (lambda_parameter
+    name: (identifier) @name)) @definition.function
+
+; Type references
+(cast_expression
+  type: (type)) @reference.type
+
+(type_arguments
+  (type)) @reference.type
+
+; Method calls
+(call_expression
+  function: (member_expression
+    member: (identifier) @name)) @reference.method
