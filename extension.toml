@@ -14,4 +14,4 @@ language = "REDscript"
 
 [grammars.redscript]
 repository = "https://github.com/jac3km4/tree-sitter-redscript"
-rev = "master"
+rev = "d2037518873b1a7e1b83c96063cd71f89b3d0edf"
