@@ -31,34 +31,3 @@
 ; Module definitions
 (module_path
   (identifier) @name) @definition.namespace
-
-; References
-(call_expression
-  function: (identifier) @name) @reference.call
-
-(member_expression
-  member: (identifier) @name) @reference.property
-
-(named_type
-  name: (identifier) @name) @reference.type
-
-; Import references
-(import_declaration
-  (module_path) @name) @reference.import
-
-; Lambda functions
-(lambda_expression
-  (lambda_parameter
-    name: (identifier) @name)) @definition.function
-
-; Type references
-(cast_expression
-  type: (type)) @reference.type
-
-(type_arguments
-  (type)) @reference.type
-
-; Method calls
-(call_expression
-  function: (member_expression
-    member: (identifier) @name)) @reference.method
