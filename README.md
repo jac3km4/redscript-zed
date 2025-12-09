@@ -15,5 +15,5 @@ Zed extension for REDscript.
       }
     }
   ```
-- Ensure that you downloaded the `redscript-ide` executable and it is in your PATH.
-  - You can set it by searching for 'Edit the system environment variables' on Windows, clicking on 'Environment Variables', and adding the path to the `redscript-ide` executable to the `Path` variable.
+- The extension will prioritize the LSP found in PATH or extension LSP settings.
+- If neither are present, the extension will automatically download the latest LSP version from https://github.com/jac3km4/redscript-ide.
