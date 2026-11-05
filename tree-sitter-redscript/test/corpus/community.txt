@@ -1,0 +1,1015 @@
+==================
+Modules and imports
+==================
+module Example.Demo
+import Std.*
+import Other.{One, Two,}
+import Exact.Path;
+---
+
+(source_file
+  (module_declaration
+    (path
+      (identifier)
+      (identifier)))
+  (declaration
+    (import_declaration
+      (path
+        (identifier))))
+  (declaration
+    (import_declaration
+      (path
+        (identifier))
+      (identifier)
+      (identifier)))
+  (declaration
+    (import_declaration
+      (path
+        (identifier)
+        (identifier)))))
+
+==================
+Declarations and qualifiers
+==================
+/// Documentation
+@addMethod(Player)
+public native class Demo<+T extends IScriptable, -U> extends Base<T> {
+  private persistent let default: [T] = [];
+  default default = [null];
+  native func Native(opt out const skip value: T) -> const ref<T>;
+  cb func Scripted() { return; }
+}
+struct Pair<A, B> { let true: A; let false: B; };
+enum Mode: Int32 { default = -1, true = 0, Last = 2147483648l, };
+---
+
+(source_file
+  (line_comment)
+  (declaration
+    (annotation
+      (identifier)
+      (value_arguments
+        (expression
+          (identifier))))
+    (visibility)
+    (qualifier)
+    (class_declaration
+      (identifier)
+      (type_parameters
+        (type_parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier))))
+        (type_parameter
+          (identifier)))
+      (type
+        (named_type
+          (identifier)
+          (type_arguments
+            (type
+              (named_type
+                (identifier))))))
+      (declaration_body
+        (declaration
+          (visibility)
+          (qualifier)
+          (field_declaration
+            (identifier)
+            (type
+              (array_type
+                (type
+                  (named_type
+                    (identifier)))))
+            (expression
+              (array_literal))))
+        (declaration
+          (default_declaration
+            (identifier)
+            (expression
+              (array_literal
+                (expression
+                  (null_literal))))))
+        (declaration
+          (qualifier)
+          (function_declaration
+            (identifier)
+            (parameters
+              (parameter
+                (parameter_qualifier)
+                (parameter_qualifier)
+                (parameter_qualifier)
+                (parameter_qualifier)
+                (identifier)
+                (type
+                  (named_type
+                    (identifier)))))
+            (type
+              (named_type
+                (identifier)
+                (type_arguments
+                  (type
+                    (named_type
+                      (identifier))))))))
+        (declaration
+          (qualifier)
+          (function_declaration
+            (identifier)
+            (parameters)
+            (block
+              (return_statement)))))))
+  (declaration
+    (struct_declaration
+      (identifier)
+      (type_parameters
+        (type_parameter
+          (identifier))
+        (type_parameter
+          (identifier)))
+      (declaration_body
+        (declaration
+          (field_declaration
+            (identifier)
+            (type
+              (named_type
+                (identifier)))))
+        (declaration
+          (field_declaration
+            (identifier)
+            (type
+              (named_type
+                (identifier))))))))
+  (declaration
+    (enum_declaration
+      (identifier)
+      (type
+        (named_type
+          (identifier)))
+      (enum_variant
+        (identifier)
+        (integer_literal))
+      (enum_variant
+        (identifier)
+        (integer_literal))
+      (enum_variant
+        (identifier)
+        (integer_literal)))))
+
+==================
+Function forms and types
+==================
+func Identity<T>(x: T,) -> T = x;
+native func Declaration()
+explicit func Convert(x: Int32) -> String = "value"
+implicit func ConvertOther(x: String) -> Int32 = 0
+func operator[](x: [Int32; 4], f: (Int32, String) -> [ref<Item>]) -> const Int32 { return x[0]; }
+func EmptyGeneric<>() -> Box<>;
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (type_parameters
+        (type_parameter
+          (identifier)))
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier)))))
+      (type
+        (named_type
+          (identifier)))
+      (expression
+        (identifier))))
+  (declaration
+    (qualifier)
+    (function_declaration
+      (identifier)
+      (parameters)))
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier)))))
+      (type
+        (named_type
+          (identifier)))
+      (expression
+        (string_literal
+          (string_content)))))
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier)))))
+      (type
+        (named_type
+          (identifier)))
+      (expression
+        (integer_literal))))
+  (declaration
+    (function_declaration
+      (operator_name)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (array_type
+              (type
+                (named_type
+                  (identifier)))
+              (integer_literal))))
+        (parameter
+          (identifier)
+          (type
+            (function_type
+              (type
+                (named_type
+                  (identifier)))
+              (type
+                (named_type
+                  (identifier)))
+              (type
+                (array_type
+                  (type
+                    (named_type
+                      (identifier)
+                      (type_arguments
+                        (type
+                          (named_type
+                            (identifier))))))))))))
+      (type
+        (named_type
+          (identifier)))
+      (block
+        (return_statement
+          (expression
+            (index_expression
+              (expression
+                (identifier))
+              (expression
+                (integer_literal))))))))
+  (declaration
+    (function_declaration
+      (identifier)
+      (type_parameters)
+      (parameters)
+      (type
+        (named_type
+          (identifier)
+          (type_arguments))))))
+
+==================
+Escaped and prefixed strings
+==================
+func Strings() {
+  let plain = "line\n\r\t\'\"\\\u{1F600}";
+  let name = n"a\"b";
+  let resource = r"path\\file";
+  let tweak = t"Record.Name";
+  let interpolation = s"value \(Call((1 + 2), "inner")) / \(s"nested \(this.value)")";
+  let escaped = s"literal \\(notInterpolation)";
+  let multiline = "first
+second";
+}
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (local_declaration
+          (identifier)
+          (expression
+            (string_literal
+              (string_content)
+              (escape_sequence)
+              (escape_sequence)
+              (escape_sequence)
+              (escape_sequence)
+              (escape_sequence)
+              (escape_sequence)
+              (escape_sequence))))
+        (local_declaration
+          (identifier)
+          (expression
+            (cname_literal
+              (string_content)
+              (escape_sequence)
+              (string_content))))
+        (local_declaration
+          (identifier)
+          (expression
+            (resource_literal
+              (string_content)
+              (escape_sequence)
+              (string_content))))
+        (local_declaration
+          (identifier)
+          (expression
+            (tweakdbid_literal
+              (string_content))))
+        (local_declaration
+          (identifier)
+          (expression
+            (interpolated_string
+              (string_content)
+              (interpolation
+                (expression
+                  (call_expression
+                    (expression
+                      (identifier))
+                    (arguments
+                      (expression
+                        (parenthesized_expression
+                          (expression
+                            (binary_expression
+                              (expression
+                                (integer_literal))
+                              (expression
+                                (integer_literal))))))
+                      (expression
+                        (string_literal
+                          (string_content)))))))
+              (string_content)
+              (interpolation
+                (expression
+                  (interpolated_string
+                    (string_content)
+                    (interpolation
+                      (expression
+                        (member_expression
+                          (expression
+                            (this_expression))
+                          (identifier))))))))))
+        (local_declaration
+          (identifier)
+          (expression
+            (interpolated_string
+              (string_content)
+              (escape_sequence)
+              (string_content))))
+        (local_declaration
+          (identifier)
+          (expression
+            (string_literal
+              (string_content))))))))
+
+==================
+Nested comments and newline comments
+==================
+/* outer /* inner */ outer */
+func Comments() {
+  // line comment
+  let x /* outer /* nested */ tail */ = 1;
+  /// doc-like comment in body
+  return x;
+}
+---
+
+(source_file
+  (block_comment)
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (line_comment)
+        (local_declaration
+          (identifier)
+          (block_comment)
+          (expression
+            (integer_literal)))
+        (line_comment)
+        (return_statement
+          (expression
+            (identifier)))))))
+
+==================
+Expressions and numeric suffixes
+==================
+func Expressions() {
+  let values = [0, 1u, 2l, 3ul, 4.0, 5.d, 6d, 7.2e-03, 8e+02d];
+  let min = -2147483648;
+  let object = new Box<ref<Item>>();
+  let result = object.Method<Int32, [String],>(, 2,, 4,)[0].default;
+  let cast = -object.value as ref<Item>;
+  let choice = true ? null : false ? this : super;
+  a = b += c = d;
+  a |= b & c ^ d | e && f || g;
+  a -= b * c / d % e + f - g;
+  a *= b; a /= c; a &= d;
+  let compare = a < b && b <= c && c > d && d >= e && e == f && f != g;
+  let unary = !a || ~b == -c;
+}
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (local_declaration
+          (identifier)
+          (expression
+            (array_literal
+              (expression
+                (integer_literal))
+              (expression
+                (integer_literal))
+              (expression
+                (integer_literal))
+              (expression
+                (integer_literal))
+              (expression
+                (float_literal))
+              (expression
+                (float_literal))
+              (expression
+                (float_literal))
+              (expression
+                (float_literal))
+              (expression
+                (float_literal)))))
+        (local_declaration
+          (identifier)
+          (expression
+            (unary_expression
+              (expression
+                (integer_literal)))))
+        (local_declaration
+          (identifier)
+          (expression
+            (new_expression
+              (type
+                (named_type
+                  (identifier)
+                  (type_arguments
+                    (type
+                      (named_type
+                        (identifier)
+                        (type_arguments
+                          (type
+                            (named_type
+                              (identifier)))))))))
+              (value_arguments))))
+        (local_declaration
+          (identifier)
+          (expression
+            (member_expression
+              (expression
+                (index_expression
+                  (expression
+                    (call_expression
+                      (expression
+                        (member_expression
+                          (expression
+                            (identifier))
+                          (identifier)))
+                      (call_type_arguments
+                        (type
+                          (named_type
+                            (identifier)))
+                        (type
+                          (array_type
+                            (type
+                              (named_type
+                                (identifier))))))
+                      (arguments
+                        (expression
+                          (integer_literal))
+                        (expression
+                          (integer_literal)))))
+                  (expression
+                    (integer_literal))))
+              (identifier))))
+        (local_declaration
+          (identifier)
+          (expression
+            (dynamic_cast_expression
+              (expression
+                (unary_expression
+                  (expression
+                    (member_expression
+                      (expression
+                        (identifier))
+                      (identifier)))))
+              (type
+                (named_type
+                  (identifier)
+                  (type_arguments
+                    (type
+                      (named_type
+                        (identifier)))))))))
+        (local_declaration
+          (identifier)
+          (expression
+            (conditional_expression
+              (expression
+                (boolean_literal))
+              (expression
+                (null_literal))
+              (expression
+                (conditional_expression
+                  (expression
+                    (boolean_literal))
+                  (expression
+                    (this_expression))
+                  (expression
+                    (super_expression)))))))
+        (expression_statement
+          (expression
+            (assignment_expression
+              (expression
+                (identifier))
+              (expression
+                (assignment_expression
+                  (expression
+                    (identifier))
+                  (expression
+                    (assignment_expression
+                      (expression
+                        (identifier))
+                      (expression
+                        (identifier)))))))))
+        (expression_statement
+          (expression
+            (assignment_expression
+              (expression
+                (identifier))
+              (expression
+                (binary_expression
+                  (expression
+                    (binary_expression
+                      (expression
+                        (binary_expression
+                          (expression
+                            (binary_expression
+                              (expression
+                                (binary_expression
+                                  (expression
+                                    (identifier))
+                                  (expression
+                                    (identifier))))
+                              (expression
+                                (identifier))))
+                          (expression
+                            (identifier))))
+                      (expression
+                        (identifier))))
+                  (expression
+                    (identifier)))))))
+        (expression_statement
+          (expression
+            (assignment_expression
+              (expression
+                (identifier))
+              (expression
+                (binary_expression
+                  (expression
+                    (binary_expression
+                      (expression
+                        (binary_expression
+                          (expression
+                            (binary_expression
+                              (expression
+                                (binary_expression
+                                  (expression
+                                    (identifier))
+                                  (expression
+                                    (identifier))))
+                              (expression
+                                (identifier))))
+                          (expression
+                            (identifier))))
+                      (expression
+                        (identifier))))
+                  (expression
+                    (identifier)))))))
+        (expression_statement
+          (expression
+            (assignment_expression
+              (expression
+                (identifier))
+              (expression
+                (identifier)))))
+        (expression_statement
+          (expression
+            (assignment_expression
+              (expression
+                (identifier))
+              (expression
+                (identifier)))))
+        (expression_statement
+          (expression
+            (assignment_expression
+              (expression
+                (identifier))
+              (expression
+                (identifier)))))
+        (local_declaration
+          (identifier)
+          (expression
+            (binary_expression
+              (expression
+                (binary_expression
+                  (expression
+                    (binary_expression
+                      (expression
+                        (binary_expression
+                          (expression
+                            (binary_expression
+                              (expression
+                                (binary_expression
+                                  (expression
+                                    (identifier))
+                                  (expression
+                                    (identifier))))
+                              (expression
+                                (binary_expression
+                                  (expression
+                                    (identifier))
+                                  (expression
+                                    (identifier))))))
+                          (expression
+                            (binary_expression
+                              (expression
+                                (identifier))
+                              (expression
+                                (identifier))))))
+                      (expression
+                        (binary_expression
+                          (expression
+                            (identifier))
+                          (expression
+                            (identifier))))))
+                  (expression
+                    (binary_expression
+                      (expression
+                        (identifier))
+                      (expression
+                        (identifier))))))
+              (expression
+                (binary_expression
+                  (expression
+                    (identifier))
+                  (expression
+                    (identifier)))))))
+        (local_declaration
+          (identifier)
+          (expression
+            (binary_expression
+              (expression
+                (unary_expression
+                  (expression
+                    (identifier))))
+              (expression
+                (binary_expression
+                  (expression
+                    (unary_expression
+                      (expression
+                        (identifier))))
+                  (expression
+                    (unary_expression
+                      (expression
+                        (identifier)))))))))))))
+
+==================
+Lambda and generic ambiguity
+==================
+func Lambdas() {
+  let identity = (x) -> x;
+  let typed = (x: Int32, y: Int32,) -> x + y;
+  let block = () -> { return 1; };
+  let nested = (x) -> (y) -> x + y;
+  let grouped = (x) + y;
+  let comparison = a < b > (c);
+  let generic = Call<(Int32) -> String>((x) -> "a");
+  let castComparison = x as Int32 < y;
+}
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (local_declaration
+          (identifier)
+          (expression
+            (lambda_expression
+              (lambda_parameters
+                (lambda_parameter
+                  (identifier)))
+              (expression
+                (identifier)))))
+        (local_declaration
+          (identifier)
+          (expression
+            (lambda_expression
+              (lambda_parameters
+                (lambda_parameter
+                  (identifier)
+                  (type
+                    (named_type
+                      (identifier))))
+                (lambda_parameter
+                  (identifier)
+                  (type
+                    (named_type
+                      (identifier)))))
+              (expression
+                (binary_expression
+                  (expression
+                    (identifier))
+                  (expression
+                    (identifier)))))))
+        (local_declaration
+          (identifier)
+          (expression
+            (lambda_expression
+              (lambda_parameters)
+              (block
+                (return_statement
+                  (expression
+                    (integer_literal)))))))
+        (local_declaration
+          (identifier)
+          (expression
+            (lambda_expression
+              (lambda_parameters
+                (lambda_parameter
+                  (identifier)))
+              (expression
+                (lambda_expression
+                  (lambda_parameters
+                    (lambda_parameter
+                      (identifier)))
+                  (expression
+                    (binary_expression
+                      (expression
+                        (identifier))
+                      (expression
+                        (identifier)))))))))
+        (local_declaration
+          (identifier)
+          (expression
+            (binary_expression
+              (expression
+                (parenthesized_expression
+                  (expression
+                    (identifier))))
+              (expression
+                (identifier)))))
+        (local_declaration
+          (identifier)
+          (expression
+            (call_expression
+              (expression
+                (identifier))
+              (call_type_arguments
+                (type
+                  (named_type
+                    (identifier))))
+              (arguments
+                (expression
+                  (identifier))))))
+        (local_declaration
+          (identifier)
+          (expression
+            (call_expression
+              (expression
+                (identifier))
+              (call_type_arguments
+                (type
+                  (function_type
+                    (type
+                      (named_type
+                        (identifier)))
+                    (type
+                      (named_type
+                        (identifier))))))
+              (arguments
+                (expression
+                  (lambda_expression
+                    (lambda_parameters
+                      (lambda_parameter
+                        (identifier)))
+                    (expression
+                      (string_literal
+                        (string_content)))))))))
+        (local_declaration
+          (identifier)
+          (expression
+            (binary_expression
+              (expression
+                (dynamic_cast_expression
+                  (expression
+                    (identifier))
+                  (type
+                    (named_type
+                      (identifier)))))
+              (expression
+                (identifier)))))))))
+
+==================
+Control flow and patterns
+==================
+func Control(value: Variant) {
+  const count: Int32 = 1;
+  let uninitialized;
+  if value != null { Call(); } else if false { return; } else { Call(); };
+  while (true) { continue; };
+  for item in [1, 2, 3,] { Call(item); };
+  if let Outer { default: [first? as Int32?, ..], true, false: other } = value {}
+  while let [.., last] = value { break; }
+  switch value {
+    case let Outer { inner: bound? as Item }:
+      break;
+    default:
+      return;
+    case 0:
+    case 1:
+      Call();
+  };
+}
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier)))))
+      (block
+        (local_declaration
+          (identifier)
+          (type
+            (named_type
+              (identifier)))
+          (expression
+            (integer_literal)))
+        (local_declaration
+          (identifier))
+        (if_statement
+          (condition
+            (expression
+              (binary_expression
+                (expression
+                  (identifier))
+                (expression
+                  (null_literal)))))
+          (block
+            (expression_statement
+              (expression
+                (call_expression
+                  (expression
+                    (identifier))
+                  (arguments)))))
+          (condition
+            (expression
+              (boolean_literal)))
+          (block
+            (return_statement))
+          (block
+            (expression_statement
+              (expression
+                (call_expression
+                  (expression
+                    (identifier))
+                  (arguments))))))
+        (while_statement
+          (condition
+            (expression
+              (parenthesized_expression
+                (expression
+                  (boolean_literal)))))
+          (block
+            (continue_statement)))
+        (for_statement
+          (identifier)
+          (expression
+            (array_literal
+              (expression
+                (integer_literal))
+              (expression
+                (integer_literal))
+              (expression
+                (integer_literal))))
+          (block
+            (expression_statement
+              (expression
+                (call_expression
+                  (expression
+                    (identifier))
+                  (arguments
+                    (expression
+                      (identifier))))))))
+        (if_statement
+          (condition
+            (pattern
+              (aggregate_pattern
+                (identifier)
+                (field_pattern
+                  (identifier)
+                  (pattern
+                    (array_pattern
+                      (pattern
+                        (nullable_pattern
+                          (pattern
+                            (as_pattern
+                              (pattern
+                                (nullable_pattern
+                                  (pattern
+                                    (identifier))))
+                              (type
+                                (named_type
+                                  (identifier)))))))
+                      (spread_pattern))))
+                (field_pattern
+                  (identifier))
+                (field_pattern
+                  (identifier)
+                  (pattern
+                    (identifier)))))
+            (expression
+              (identifier)))
+          (block))
+        (while_statement
+          (condition
+            (pattern
+              (array_pattern
+                (spread_pattern)
+                (pattern
+                  (identifier))))
+            (expression
+              (identifier)))
+          (block
+            (break_statement)))
+        (switch_statement
+          (expression
+            (identifier))
+          (switch_section
+            (pattern
+              (aggregate_pattern
+                (identifier)
+                (field_pattern
+                  (identifier)
+                  (pattern
+                    (as_pattern
+                      (pattern
+                        (nullable_pattern
+                          (pattern
+                            (identifier))))
+                      (type
+                        (named_type
+                          (identifier))))))))
+            (break_statement))
+          (switch_section
+            (return_statement))
+          (switch_section
+            (expression
+              (integer_literal)))
+          (switch_section
+            (expression
+              (integer_literal))
+            (expression_statement
+              (expression
+                (call_expression
+                  (expression
+                    (identifier))
+                  (arguments))))))))))
+
+==================
+Unfinished nested comment remains an editing token
+==================
+func Incomplete() {}
+/* unfinished /* nested */
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block)))
+  (block_comment))

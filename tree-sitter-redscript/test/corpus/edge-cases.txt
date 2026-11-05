@@ -1,0 +1,232 @@
+==================
+String whitespace and comment markers are content
+==================
+func Strings() {
+  let empty = "";
+  let spaces = "   ";
+  let comments = "/* not a comment */ // nor this";
+  let interpolated = s" /* text */ \(1 /* actual comment */ + 2) // text ";
+}
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (local_declaration
+          (identifier)
+          (expression
+            (string_literal)))
+        (local_declaration
+          (identifier)
+          (expression
+            (string_literal
+              (string_content))))
+        (local_declaration
+          (identifier)
+          (expression
+            (string_literal
+              (string_content))))
+        (local_declaration
+          (identifier)
+          (expression
+            (interpolated_string
+              (string_content)
+              (interpolation
+                (expression
+                  (binary_expression
+                    (expression
+                      (integer_literal))
+                    (block_comment)
+                    (expression
+                      (integer_literal)))))
+              (string_content))))))))
+
+==================
+Qualifier names are also valid parameter names
+==================
+func Qualifiers(opt: Int32, const: String, skip: Bool, out: Int32) -> const [String] = [];
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier))))
+        (parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier))))
+        (parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier))))
+        (parameter
+          (identifier)
+          (type
+            (named_type
+              (identifier)))))
+      (type
+        (array_type
+          (type
+            (named_type
+              (identifier)))))
+      (expression
+        (array_literal)))))
+
+==================
+Generic and comparison precedence
+==================
+func Precedence() {
+  a = b = c + d * e;
+  a ? b : c ? d : e;
+  -Call<T>() + !value as Bool;
+  a < b && c > d;
+  Call<ref<Item>>().Method<>();
+}
+---
+
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (expression_statement
+          (expression
+            (assignment_expression
+              (expression
+                (identifier))
+              (expression
+                (assignment_expression
+                  (expression
+                    (identifier))
+                  (expression
+                    (binary_expression
+                      (expression
+                        (identifier))
+                      (expression
+                        (binary_expression
+                          (expression
+                            (identifier))
+                          (expression
+                            (identifier)))))))))))
+        (expression_statement
+          (expression
+            (conditional_expression
+              (expression
+                (identifier))
+              (expression
+                (identifier))
+              (expression
+                (conditional_expression
+                  (expression
+                    (identifier))
+                  (expression
+                    (identifier))
+                  (expression
+                    (identifier)))))))
+        (expression_statement
+          (expression
+            (binary_expression
+              (expression
+                (call_expression
+                  (expression
+                    (unary_expression
+                      (expression
+                        (identifier))))
+                  (call_type_arguments
+                    (type
+                      (named_type
+                        (identifier))))
+                  (arguments)))
+              (expression
+                (dynamic_cast_expression
+                  (expression
+                    (unary_expression
+                      (expression
+                        (identifier))))
+                  (type
+                    (named_type
+                      (identifier))))))))
+        (expression_statement
+          (expression
+            (binary_expression
+              (expression
+                (binary_expression
+                  (expression
+                    (identifier))
+                  (expression
+                    (identifier))))
+              (expression
+                (binary_expression
+                  (expression
+                    (identifier))
+                  (expression
+                    (identifier)))))))
+        (expression_statement
+          (expression
+            (call_expression
+              (expression
+                (member_expression
+                  (expression
+                    (call_expression
+                      (expression
+                        (identifier))
+                      (call_type_arguments
+                        (type
+                          (named_type
+                            (identifier)
+                            (type_arguments
+                              (type
+                                (named_type
+                                  (identifier)))))))
+                      (arguments)))
+                  (identifier)))
+              (call_type_arguments)
+              (arguments))))))))
+
+==================
+REDmod function syntax is rejected
+:error
+==================
+function Other() {}
+---
+
+(ERROR)
+
+==================
+Grouped parameters are rejected
+:error
+==================
+func Other(a, b: Int32) {}
+---
+
+(ERROR)
+
+==================
+Invalid string escapes are rejected
+:error
+==================
+func Other() { let bad = "\q"; }
+---
+
+(ERROR)
+
+==================
+Const let is not a community local declaration
+:error
+==================
+func Other() { const let value = 1; }
+---
+
+(ERROR)
