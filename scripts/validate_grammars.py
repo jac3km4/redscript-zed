@@ -64,12 +64,14 @@ def checkout(name, pin):
     require(repository.startswith("https://"), f"{name}: expected HTTPS repository")
     require("path" not in pin, f"{name}: validator expects a repository-root parser")
     directory = WORK / name
-    if not directory.exists():
+    cached = directory.exists()
+    if not cached:
         run("git", "clone", "--no-checkout", repository, directory)
     require(run("git", "-C", directory, "remote", "get-url", "origin", capture=True).strip()
             == repository, f"{name}: cached repository URL differs; remove {directory}")
-    require(not run("git", "--no-pager", "-C", directory, "diff", "HEAD", "--",
-                    capture=True).strip(), f"{name}: cached checkout has tracked changes")
+    if cached:
+        require(not run("git", "--no-pager", "-C", directory, "diff", "HEAD", "--",
+                        capture=True).strip(), f"{name}: cached checkout has tracked changes")
     run("git", "-C", directory, "fetch", "--depth=1", "origin", rev)
     run("git", "-C", directory, "checkout", "--detach", rev)
     require(run("git", "-C", directory, "rev-parse", "HEAD", capture=True).strip() == rev,
