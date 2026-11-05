@@ -1,33 +1,24 @@
-; Class-like definitions
-(class_declaration
-  name: (identifier) @name) @definition.class
+(class_declaration name: (identifier) @name) @definition.class
+(struct_declaration name: (identifier) @name) @definition.struct
+(enum_declaration name: (identifier) @name) @definition.enum
 
-(struct_declaration
-  name: (identifier) @name) @definition.struct
+; Aggregate members are methods; standalone declarations are functions.
+(source_file
+  (declaration
+    (function_declaration name: [(identifier) (operator_name)] @name) @definition.function))
+(declaration_body
+  (declaration
+    (function_declaration name: [(identifier) (operator_name)] @name) @definition.method))
 
-(enum_declaration
-  name: (identifier) @name) @definition.enum
+(field_declaration name: (identifier) @name) @definition.field
+(enum_variant name: (identifier) @name) @definition.enum
+(parameter name: (identifier) @name) @definition.parameter
+(lambda_parameter name: (identifier) @name) @definition.parameter
+(local_declaration name: (identifier) @name) @definition.variable
+(for_statement name: (identifier) @name) @definition.variable
+(module_declaration (path) @name) @definition.namespace
 
-; Function definitions
-(function_declaration
-  name: (identifier) @name) @definition.method
-
-; Field/Property definitions
-(field_declaration
-  name: (identifier) @name) @definition.field
-
-; Enum entries
-(enum_entry
-  name: (identifier) @name) @definition.enum
-
-; Parameters in functions
-(parameter
-  name: (identifier) @name) @definition.parameter
-
-; Let declarations
-(let_statement
-  name: (identifier) @name) @definition.variable
-
-; Module definitions
-(module_path
-  (identifier) @name) @definition.namespace
+(call_expression function: (expression (identifier) @name)) @reference.call
+(call_expression
+  function: (expression (member_expression member: (identifier) @name))) @reference.call
+(named_type name: (identifier) @name) @reference.type

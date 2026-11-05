@@ -163,15 +163,7 @@ impl zed::Extension for RedscriptExtension {
         worktree: &zed::Worktree,
     ) -> zed::Result<Option<zed::serde_json::Value>> {
         let settings = zed::settings::LspSettings::for_worktree("redscript-ide", worktree)?;
-        let options = settings
-            .initialization_options
-            .ok_or_else(|| "Could not find initialization options for redscript-ide".to_owned())?;
-        let game_dir = options.get("game_dir").ok_or_else(|| {
-            "Could not find game_dir for redscript-ide in the settings".to_owned()
-        })?;
-        Ok(Some(zed::serde_json::json!({
-            "game_dir": game_dir
-        })))
+        Ok(settings.initialization_options)
     }
 }
 

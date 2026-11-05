@@ -10,8 +10,13 @@ repository = "https://github.com/jac3km4/redscript-zed"
 
 [language_servers.redscript-ide]
 name = "redscript-ide"
-language = "REDscript"
+languages = ["REDscript", "REDmod"]
+language_ids = { REDscript = "redscript", REDmod = "redmod" }
 
 [grammars.redscript]
-repository = "https://github.com/jac3km4/tree-sitter-redscript"
-rev = "d2037518873b1a7e1b83c96063cd71f89b3d0edf"
+repository = "https://github.com/jac3km4/tree-sitter-reds"
+rev = "3f1cf9b3954dcfd61fda9887d923a143a73c4be0"
+
+[grammars.redmod]
+repository = "https://github.com/jac3km4/tree-sitter-redmod"
+rev = "f17f236cffdc918429f4f5d86f8ed35e4c2a900f"

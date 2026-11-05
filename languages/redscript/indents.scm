@@ -1,28 +1,29 @@
+; Capture containers rather than declarations to avoid double-indenting bodies.
 [
-  (class_declaration)
-  (struct_declaration)
-  (enum_declaration)
-  (function_declaration)
+  (declaration_body)
   (block)
+  (enum_declaration)
   (switch_statement)
-  (if_statement)
-  (while_statement)
-  (for_statement)
   (array_literal)
-] @indent.begin
+  (array_type)
+  (array_pattern)
+  (aggregate_pattern)
+  (parameters)
+  (lambda_parameters)
+  (arguments)
+  (value_arguments)
+  (type_parameters)
+  (type_arguments)
+  (call_type_arguments)
+  (function_type)
+  (parenthesized_expression)
+  (interpolation)
+] @indent
 
-[
-  "}"
-  "]"
-  ")"
-] @indent.end
+["}" "]" ")"] @outdent
+(type_parameters ">" @outdent)
+(type_arguments ">" @outdent)
+(call_type_arguments ">" @outdent)
 
-(case_clause) @indent.branch
-(if_statement
-  alternative: (_)) @indent.branch
-
-[
-  (line_comment)
-  (block_comment)
-  (doc_comment)
-] @indent.ignore
+; Labels stay at switch-body indentation; statements gain one more level.
+(switch_section ":" @start) @indent

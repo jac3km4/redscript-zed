@@ -1,23 +1,19 @@
+; Zed supports function, class, and comment text objects.
+; Capture body children so inside selections exclude braces.
 (function_declaration
-  body: (block) @function.inside) @function.around
+  body: (block "{" (_)* @function.inside "}")) @function.around
+(function_declaration
+  body: (expression) @function.inside) @function.around
+; Also allow navigating declaration-only functions.
+(function_declaration !body) @function.around
 
 (class_declaration
-  body: (_) @class.inside) @class.around
-
+  (declaration_body "{" (_)* @class.inside "}")) @class.around
 (struct_declaration
-  body: (_) @struct.inside) @struct.around
+  (declaration_body "{" (_)* @class.inside "}")) @class.around
+(enum_declaration
+  "{" (enum_variant)* @class.inside "}") @class.around
 
-(if_statement
-  condition: (_) @conditional.inside) @conditional.around
-
-(while_statement
-  condition: (_) @loop.inside) @loop.around
-
-(for_statement
-  (block) @loop.inside) @loop.around
-
-(parameter
-  ":" @parameter.inside) @parameter.around
-
-(lambda_expression
-  expression_body: (_) @function.inside) @function.around
+; Lambdas deliberately do not become method-navigation stops.
+(line_comment)+ @comment.around
+(block_comment) @comment.around
