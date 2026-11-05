@@ -29,13 +29,13 @@ impl RedscriptExtension {
         }
 
         if let Some(path) = &self.cached_lsp_path {
-            if fs::metadata(path).map_or(false, |stat| stat.is_file()) {
+            if fs::metadata(path).is_ok_and(|stat| stat.is_file()) {
                 return Ok(path.to_string());
             }
         }
 
         zed::set_language_server_installation_status(
-            &lsp_id,
+            lsp_id,
             &zed::LanguageServerInstallationStatus::CheckingForUpdate,
         );
 
@@ -97,9 +97,9 @@ impl RedscriptExtension {
             }
         );
 
-        if !fs::metadata(&filename).map_or(false, |stat| stat.is_file()) {
+        if !fs::metadata(&filename).is_ok_and(|stat| stat.is_file()) {
             zed::set_language_server_installation_status(
-                &lsp_id,
+                lsp_id,
                 &zed::LanguageServerInstallationStatus::CheckingForUpdate,
             );
 
@@ -134,7 +134,7 @@ impl RedscriptExtension {
 
         self.cached_lsp_path = Some(filename.clone());
 
-        return Ok(filename);
+        Ok(filename)
     }
 }
 
@@ -153,11 +153,9 @@ impl zed::Extension for RedscriptExtension {
         _server_id: &zed::LanguageServerId,
         worktree: &zed::Worktree,
     ) -> zed::Result<zed::Command> {
-        let command = self.get_lsp_path(_server_id, worktree).or_else(|e| {
-            Err(format!(
-                "Failed to obtain language server path for redscript-ide: {e}"
-            ))
-        })?;
+        let command = self
+            .get_lsp_path(_server_id, worktree)
+            .map_err(|e| format!("Failed to obtain language server path for redscript-ide: {e}"))?;
 
         Ok(zed::Command {
             command,
