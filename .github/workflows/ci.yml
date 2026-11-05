@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  extension:
+    name: Rust host checks and WASI component
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-wasip2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Check host
+        run: cargo check --locked --all-targets
+      - name: Clippy host
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Test host
+        run: cargo test --locked --all-targets
+      - name: Build Zed extension component
+        run: cargo build --locked --release --target wasm32-wasip2
+
+  grammars:
+    name: Pinned grammars, queries, and parser WASM
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Emscripten 4.0.10
+        # Official emsdk 4.0.10 tag, pinned to its commit rather than a moving branch.
+        run: |
+          git clone --no-checkout https://github.com/emscripten-core/emsdk.git target/emsdk
+          git -C target/emsdk checkout --detach 62a853cd3b3134398ce85cde8bb5cbb2ef0194cb
+          target/emsdk/emsdk install 4.0.10
+          target/emsdk/emsdk activate 4.0.10
+      - name: Test validation helpers
+        run: python3 -B -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Validate remote pins, all queries, and scanner-backed WASM parsers
+        shell: bash
+        run: |
+          source target/emsdk/emsdk_env.sh
+          python3 scripts/validate_grammars.py --wasm

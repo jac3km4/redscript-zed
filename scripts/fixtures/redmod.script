@@ -1,0 +1,12 @@
+/// REDmod documentation
+[module = "validation"]
+public class Demo {
+  var value: array<ref<Demo>>;
+  default value = NULL;
+  function Run(optional index: Int32): CName {
+    /* outer /* nested */ comment */
+    if (true) { return 'Ready'; }
+    Ping(index);
+    return n"Done";
+  }
+}
