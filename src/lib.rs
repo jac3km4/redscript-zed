@@ -103,21 +103,30 @@ impl RedscriptExtension {
                 &zed::LanguageServerInstallationStatus::CheckingForUpdate,
             );
 
-            zed::download_file(
-                &asset.download_url,
-                &filename,
-                zed::DownloadedFileType::Uncompressed,
-            )
-            .map_err(|e| format!("Failed to download release {}: {}", release.version, e))?;
-
-            zed::make_file_executable(&filename)?;
+            install_download(std::path::Path::new(&filename), |temporary| {
+                let temporary = temporary
+                    .to_str()
+                    .ok_or_else(|| "Invalid download path".to_owned())?;
+                zed::download_file(
+                    &asset.download_url,
+                    temporary,
+                    zed::DownloadedFileType::Uncompressed,
+                )
+                .map_err(|e| format!("Failed to download release {}: {}", release.version, e))?;
+                zed::make_file_executable(temporary)
+            })?;
 
             // Clean up old LSP versions
             let entries =
                 fs::read_dir(".").map_err(|e| format!("Failed to list working directory: {e}"))?;
             for entry in entries {
                 let entry = entry.map_err(|e| format!("Failed to load directory entry: {e}"))?;
-                if entry.file_name().to_str() != Some(&filename) {
+                if entry.file_type().is_ok_and(|kind| kind.is_file())
+                    && entry
+                        .file_name()
+                        .to_str()
+                        .is_some_and(|name| name != filename && owned_release_file(name))
+                {
                     fs::remove_file(entry.path()).ok();
                 }
             }
@@ -164,6 +173,95 @@ impl zed::Extension for RedscriptExtension {
     ) -> zed::Result<Option<zed::serde_json::Value>> {
         let settings = zed::settings::LspSettings::for_worktree("redscript-ide", worktree)?;
         Ok(settings.initialization_options)
+    }
+}
+
+fn install_download(
+    destination: &std::path::Path,
+    download: impl FnOnce(&std::path::Path) -> zed::Result<()>,
+) -> zed::Result<()> {
+    let temporary = destination.with_extension("download");
+    let result = download(&temporary).and_then(|()| {
+        fs::rename(&temporary, destination)
+            .map_err(|e| format!("Failed to install {}: {e}", destination.display()))
+    });
+    if result.is_err() {
+        let _ = fs::remove_file(&temporary);
+    }
+    result
+}
+
+fn owned_release_file(name: &str) -> bool {
+    let Some(version) = [
+        "redscript-ide_",
+        "redscript-ide-x86_64-unknown-linux-gnu_",
+        "redscript-ide-x86_64-apple-darwin_",
+        "redscript-ide-aarch64-apple-darwin_",
+    ]
+    .iter()
+    .find_map(|prefix| name.strip_prefix(prefix)) else {
+        return false;
+    };
+    let version = version.strip_suffix(".exe").unwrap_or(version);
+    let version = version.strip_prefix('v').unwrap_or(version);
+    let core = version.split(['-', '+']).next().unwrap_or_default();
+    let mut parts = core.split('.');
+    (0..3).all(|_| {
+        parts
+            .next()
+            .is_some_and(|part| !part.is_empty() && part.bytes().all(|c| c.is_ascii_digit()))
+    }) && parts.next().is_none()
+        && version
+            .bytes()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, b'.' | b'-' | b'+'))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cleanup_only_matches_owned_release_binaries() {
+        for name in [
+            "redscript-ide_v0.2.25.exe",
+            "redscript-ide-x86_64-unknown-linux-gnu_0.2.25",
+            "redscript-ide-aarch64-apple-darwin_v1.0.0-preview.1",
+        ] {
+            assert!(owned_release_file(name), "{name}");
+        }
+        for name in [
+            "extension.wasm",
+            "settings.json",
+            "redscript-ide_notes.txt",
+            "redscript-ide_v1.0.0.exe.download",
+            "other_v1.0.0.exe",
+        ] {
+            assert!(!owned_release_file(name), "{name}");
+        }
+    }
+
+    #[test]
+    fn downloads_are_only_published_after_success() {
+        let root = std::env::temp_dir().join(format!("redscript-download-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let destination = root.join("server.exe");
+        let _ = fs::remove_file(&destination);
+        let failed = install_download(&destination, |temporary| {
+            fs::write(temporary, "partial").unwrap();
+            assert!(!destination.exists());
+            Err("interrupted".into())
+        });
+        assert!(failed.is_err());
+        assert!(!destination.exists());
+        assert!(!destination.with_extension("download").exists());
+        install_download(&destination, |temporary| {
+            fs::write(temporary, "complete").unwrap();
+            assert!(!destination.exists());
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(fs::read_to_string(&destination).unwrap(), "complete");
+        fs::remove_dir_all(root).unwrap();
     }
 }
 
