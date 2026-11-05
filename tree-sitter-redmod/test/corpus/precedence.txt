@@ -1,0 +1,62 @@
+==================
+Multiplication binds tighter than addition
+==================
+function F() { a + b * c; }
+---
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (expression_statement
+          (expression_list
+            (expression
+              (binary_expression
+                (expression (identifier))
+                (expression
+                  (binary_expression
+                    (expression (identifier))
+                    (expression (identifier))))))))))))
+
+==================
+Subtraction associates left
+==================
+function F() { a - b - c; }
+---
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (expression_statement
+          (expression_list
+            (expression
+              (binary_expression
+                (expression
+                  (binary_expression
+                    (expression (identifier))
+                    (expression (identifier))))
+                (expression (identifier))))))))))
+
+==================
+Assignment associates right
+==================
+function F() { a = b = c; }
+---
+(source_file
+  (declaration
+    (function_declaration
+      (identifier)
+      (parameters)
+      (block
+        (expression_statement
+          (expression_list
+            (expression
+              (assignment_expression
+                (expression (identifier))
+                (expression
+                  (assignment_expression
+                    (expression (identifier))
+                    (expression (identifier))))))))))))
